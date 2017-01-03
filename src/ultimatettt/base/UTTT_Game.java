@@ -181,6 +181,7 @@ public class UTTT_Game extends JFrame {
 			}
 			// simply try to win a board
 			for (int i = 0; i < 9; i++){
+				if (!boards[i/3][i%3].playable) continue;
 				int target = boardWinnable(i, 2);
 				if (target > -1){
 					if (this.boards[i/3][i%3].play(player, target/3, target%3)) {
@@ -191,6 +192,7 @@ public class UTTT_Game extends JFrame {
 			}
 			// try to block a won board for opponent
 			for (int i = 0; i < 9; i++){
+				if (!boards[i/3][i%3].playable) continue;
 				int target = boardWinnable(i, 1);
 				if (target > -1){
 					if (this.boards[i/3][i%3].play(player, target/3, target%3)) {
@@ -207,12 +209,19 @@ public class UTTT_Game extends JFrame {
 	
 	private void moveHard(){
 		// Difficulty 3, has some semblance of a plan to win the game.
-		
+		/* Priority system:
+		 * Inherit from medium, but add:
+		 * avoid target sending to opp winnable boards
+		 * send to fewest opponent squares taken
+		 * send to fewest AI squares taken
+		 * take corner > centre > side
+		 * send to side > corner > centre
+		 */
 	}
 	
+	// TODO: Difficulty 4? understanding forks, micro board strategy
+	
 	/// BEGIN AI HELPERS ///
-	
-	
 	
 	// takes board from 0 to 8 to see if winning it wins the game
 	private boolean gameWinnable(int board, int player){
@@ -268,7 +277,6 @@ public class UTTT_Game extends JFrame {
 	// AI determining if a board is winnable. return -1 for false, 0-8 for target square
 	private int boardWinnable(int board, int player){
 		Board b = boards[board/3][board%3];
-		if (!b.playable) return -1;
 		int target = -1;
 		for (int i = 0; i < 9; i++){
 			switch (i) {
