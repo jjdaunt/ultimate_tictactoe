@@ -59,7 +59,7 @@ public class UTTT_Game extends JFrame {
 				}
 			}
 		}
-		// If all boards are full with no winner, the game ends in a tie.
+		// If all boards are full or owned with no winner, the game ends in a tie.
 		for (int i = 0; i < 3; i++){
 			for (int j = 0; j < 3; j++){
 				if (this.boards[i][j].full < 9 && this.boards[i][j].getOwner() == 0) return;

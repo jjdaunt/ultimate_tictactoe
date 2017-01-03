@@ -69,7 +69,8 @@ public class Board extends JPanel {
 				}
 			}
 		}
-		if (this.getOwner() > 0) this.game.checkWin();
+		// catch a full board ending a game
+		if (this.getOwner() > 0 || this.full == 9) this.game.checkWin();
 	}
 	
 	private void setOwner(int owner){
