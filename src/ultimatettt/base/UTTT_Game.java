@@ -69,6 +69,10 @@ public class UTTT_Game extends JFrame {
 	public void setWinner(int owner){
 		int result = -1;
 		if (owner == 0) result = JOptionPane.showConfirmDialog(this, "Tie game! Would you like to play again?", "Play Again?", JOptionPane.YES_NO_OPTION);
+		else if (players == 1){
+			if (owner == 1) result = JOptionPane.showConfirmDialog(this, "You win! Would you like to play again?", "Play Again?", JOptionPane.YES_NO_OPTION);
+			else result = JOptionPane.showConfirmDialog(this, "The AI wins. Would you like to play again?", "Play Again?", JOptionPane.YES_NO_OPTION);
+		}
 		else result = JOptionPane.showConfirmDialog(this, "Player " + owner + " wins! Would you like to play again?", "Play Again?", JOptionPane.YES_NO_OPTION);
 		if (result == 0) resetBoards();
 		else System.exit(0);
@@ -82,6 +86,7 @@ public class UTTT_Game extends JFrame {
 				boards[i][j].resetBoard();
 			}
 		}
+		// TODO: Allow switch between AI and PvP here?
 	}
 	
 	// Set which board(s) are playable for the next player.
@@ -122,10 +127,10 @@ public class UTTT_Game extends JFrame {
 				if (boards[i][j].playable) {
 					for (int x = 0; x < 3; x++){
 						for (int y = 0; y < 3; y++){
-							if (boards[i][j].squares[x][y].getOwner() == 0) {
-								boards[i][j].squares[x][y].setOwner(player);
-								break move; // don't like this
-								// TODO: move tracker that highlights bot's last move
+							if (this.boards[i][j].play(player, x, y)){
+								// if move is valid, perform move and break to player change
+								setPlayables(x, y);
+								break move; // not great
 							}
 						}
 					}
