@@ -14,7 +14,7 @@ public class Board extends JPanel {
 	private int owner;
 	public boolean playable = true;
 	private Color[] colours = {new Color(191,0,0),  new Color(0,127,255)};
-	private Square[][] squares = new Square[3][3];
+	public Square[][] squares = new Square[3][3];
 	public int full = 0;
 
 	public Board(UTTT_Game game){

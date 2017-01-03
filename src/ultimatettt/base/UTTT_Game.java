@@ -14,17 +14,24 @@ public class UTTT_Game extends JFrame {
 		initUI();
 	}
 	
-	private int player = 1;
 	private Board[][] boards = new Board[3][3];
 	
+	// current player
+	private int player = 1;
 	public int getPlayer(){
 		return this.player;
 	}
 	
 	public void changePlayer(){
-		if (player == 1) player++;
+		if (player == 1) {
+			player++;
+			if (players == 1) AImove();
+		}
 		else player = 1;
 	}
+	
+	// 1 vs AI or 2P
+	public int players;
 	
 	// Detect if a player won the game (or the game ended in a tie) after completing a board.
 	public void checkWin(){
@@ -108,6 +115,27 @@ public class UTTT_Game extends JFrame {
 		}
 	}
 	
+	// The AI lives here.
+	public void AImove(){
+		move: for (int i = 0; i < 3; i++){
+			for (int j = 0; j < 3; j++){
+				if (boards[i][j].playable) {
+					for (int x = 0; x < 3; x++){
+						for (int y = 0; y < 3; y++){
+							if (boards[i][j].squares[x][y].getOwner() == 0) {
+								boards[i][j].squares[x][y].setOwner(player);
+								break move; // don't like this
+								// TODO: move tracker that highlights bot's last move
+							}
+						}
+					}
+				}
+			}
+		}
+		// return move to human player
+		changePlayer();
+	}
+	
 	private void initUI(){
 		// Initialize frame, layout
 		setTitle("Ultimate Tic Tac Toe");
@@ -126,6 +154,9 @@ public class UTTT_Game extends JFrame {
 				contentPane.add(board);
 			}
 		}
+		String[] options = new String[] {"1", "2"};
+		players = JOptionPane.showOptionDialog(this, "Select Player Count:", "Fear the AI", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]) + 1;
+		// TODO: AI difficulty options
 	}
 	
 	public static void main(String args[]){
