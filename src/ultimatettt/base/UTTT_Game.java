@@ -88,7 +88,7 @@ public class UTTT_Game extends JFrame {
 				boards[i][j].resetBoard();
 			}
 		}
-		// TODO: Full reset for player or difficulty change
+		setOptions();
 	}
 	
 	// Set which board(s) are playable for the next player.
@@ -166,6 +166,15 @@ public class UTTT_Game extends JFrame {
 		return randomNum;
 	}
 	
+	private void setOptions(){
+		String[] options = new String[] {"1", "2"};
+		players = JOptionPane.showOptionDialog(this, "Select Player Count:", "vs AI or 2 Player?", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]) + 1;
+		if (players == 1){
+			String[] diff = new String[] {"Easy", "Medium", "Hard"};
+			difficulty = JOptionPane.showOptionDialog(this, "Select AI Difficulty:", "Fear the AI", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, diff, diff[0]) + 1;
+		}
+	}
+	
 	private void initUI(){
 		// Initialize frame, layout
 		setTitle("Ultimate Tic Tac Toe");
@@ -184,12 +193,7 @@ public class UTTT_Game extends JFrame {
 				contentPane.add(board);
 			}
 		}
-		String[] options = new String[] {"1", "2"};
-		players = JOptionPane.showOptionDialog(this, "Select Player Count:", "vs AI or 2 Player?", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]) + 1;
-		if (players == 1){
-			String[] diff = new String[] {"Easy", "Medium", "Hard"};
-			difficulty = JOptionPane.showOptionDialog(this, "Select AI Difficulty:", "Fear the AI", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, diff, diff[0]) + 1;
-		}
+		setOptions();
 	}
 	
 	public static void main(String args[]){
