@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.util.Random;
 
 import javax.swing.*;;
 
@@ -32,6 +33,7 @@ public class UTTT_Game extends JFrame {
 	
 	// 1 vs AI or 2P
 	public int players;
+	private int difficulty = 1;
 	
 	// Detect if a player won the game (or the game ended in a tie) after completing a board.
 	public void checkWin(){
@@ -86,7 +88,7 @@ public class UTTT_Game extends JFrame {
 				boards[i][j].resetBoard();
 			}
 		}
-		// TODO: Allow switch between AI and PvP here?
+		// TODO: Full reset for player or difficulty change
 	}
 	
 	// Set which board(s) are playable for the next player.
@@ -122,23 +124,46 @@ public class UTTT_Game extends JFrame {
 	
 	// The AI lives here.
 	public void AImove(){
-		move: for (int i = 0; i < 3; i++){
-			for (int j = 0; j < 3; j++){
-				if (boards[i][j].playable) {
-					for (int x = 0; x < 3; x++){
-						for (int y = 0; y < 3; y++){
-							if (this.boards[i][j].play(player, x, y)){
-								// if move is valid, perform move and break to player change
-								setPlayables(x, y);
-								break move; // not great
-							}
-						}
-					}
-				}
-			}
-		}
+		if (difficulty == 1) moveEasy();
+		else if (difficulty == 2) moveMedium();
+		else moveHard();
 		// return move to human player
 		changePlayer();
+	}
+	
+	public void moveEasy(){
+		// Difficulty 1, literally moves randomly until success. Not great.
+		for (;;) {
+			int i = randInt(0, 2);
+			int j = randInt(0, 2);
+			if (boards[i][j].playable) {
+				int x = randInt(0, 2);
+				int y = randInt(0, 2);
+				// if move is valid, perform move and break to player change
+				if (this.boards[i][j].play(player, x, y)) {
+					if (getPlayer() > 0) setPlayables(x, y);
+					break;
+				}
+				
+			}
+		}
+	}
+	
+	public void moveMedium(){
+		// Difficulty 2, actually tries. Will win boards (and games) if it can, but doesn't think beyond that.
+		
+	}
+	
+	public void moveHard(){
+		// Difficulty 3, has some semblance of a plan to win the game.
+		
+	}
+	
+	
+	public static int randInt(int min, int max){
+		Random rand = new Random();
+		int randomNum = rand.nextInt((max - min) + 1) + min;
+		return randomNum;
 	}
 	
 	private void initUI(){
@@ -160,8 +185,11 @@ public class UTTT_Game extends JFrame {
 			}
 		}
 		String[] options = new String[] {"1", "2"};
-		players = JOptionPane.showOptionDialog(this, "Select Player Count:", "Fear the AI", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]) + 1;
-		// TODO: AI difficulty options
+		players = JOptionPane.showOptionDialog(this, "Select Player Count:", "vs AI or 2 Player?", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]) + 1;
+		if (players == 1){
+			String[] diff = new String[] {"Easy", "Medium", "Hard"};
+			difficulty = JOptionPane.showOptionDialog(this, "Select AI Difficulty:", "Fear the AI", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, diff, diff[0]) + 1;
+		}
 	}
 	
 	public static void main(String args[]){
