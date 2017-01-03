@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 public class Square extends JPanel implements MouseListener {
 	
 	private int owner;
-	private Color[] colours = {Color.RED, Color.BLUE, new Color(255,192,183), new Color(135,206,250)};
+	private Color[] colours = {Color.RED, Color.BLUE, new Color(255,192,183), new Color(135,206,250), Color.PINK, Color.CYAN};
 	private Board board;
 	private UTTT_Game game;
 	private int x;
@@ -61,7 +61,9 @@ public class Square extends JPanel implements MouseListener {
 	
 	public void setOwner(int owner){
 		this.owner = owner;
-		this.setBackground(colours[owner-1]);
+		this.setBackground(colours[owner+3]);
+		if (this.game.lastmove != null) this.game.lastmove.setBackground(colours[this.game.lastmove.getOwner()-1]);
+		this.game.lastmove = this;
 	}
 	
 	void reset(){

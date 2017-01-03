@@ -34,6 +34,7 @@ public class UTTT_Game extends JFrame {
 	// 1 vs AI or 2P
 	public int players;
 	private int difficulty = 1;
+	public Square lastmove = null;
 	
 	// Detect if a player won the game (or the game ended in a tie) after completing a board.
 	public void checkWin(){
@@ -88,6 +89,7 @@ public class UTTT_Game extends JFrame {
 				boards[i][j].resetBoard();
 			}
 		}
+		lastmove = null;
 		setOptions();
 	}
 	
@@ -209,6 +211,8 @@ public class UTTT_Game extends JFrame {
 	}
 	
 	/// BEGIN AI HELPERS ///
+	
+	
 	
 	// takes board from 0 to 8 to see if winning it wins the game
 	private boolean gameWinnable(int board, int player){
