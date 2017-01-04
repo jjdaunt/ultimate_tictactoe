@@ -257,7 +257,7 @@ public class UTTT_Game extends JFrame {
 				int target = boardWinnable(i, 2);
 				if (target > -1 && !lossBoards.contains(target) && !winBoards.contains(target)){
 					// also avoid allowing opponent to play openly if that leads directly to a loss
-					if (boards[target/3][target%3].getOwner() > 0 && !lossBoards.isEmpty()) continue;
+					if ((boards[target/3][target%3].getOwner() > 0 || boards[target/3][target%3].full == 9) && !lossBoards.isEmpty()) continue;
 					if (this.boards[i/3][i%3].play(player, target/3, target%3)) {
 						if (getPlayer() > 0) setPlayables(target/3, target%3);
 						break move;
@@ -274,7 +274,7 @@ public class UTTT_Game extends JFrame {
 					// TODO: ignores fork possibilities, fix under D4
 					if (lossBoards.contains(target) && target != i) continue;
 					// also avoid allowing opponent to play openly if that leads directly to a loss
-					if (boards[target/3][target%3].getOwner() > 0 && !lossBoards.isEmpty()) continue;
+					if ((boards[target/3][target%3].getOwner() > 0 || boards[target/3][target%3].full == 9) && !lossBoards.isEmpty()) continue;
 					if (this.boards[i/3][i%3].play(player, target/3, target%3)) {
 						if (getPlayer() > 0) setPlayables(target/3, target%3);
 						break move;
@@ -287,25 +287,168 @@ public class UTTT_Game extends JFrame {
 			for (int i = 0; i < 9; i++){
 				if (!boards[i/3][i%3].playable) continue;
 				for (int j = 0; j < 9; j++){
-					
+					Square square = boards[i/3][i%3].squares[j/3][j%3];
+					if (square.getOwner() == 0) playables.add(square);
 				}
 			}
 			// elimination set
 			ArrayList<Square> elims = new ArrayList<Square>(81);
-			
 			// begin eliminating with avoidance hierarchy: loss, win, w, ow, gw, ogw
+			// TODO: Condense this after testing it, you monkey
+			for (int i = 0; i < playables.size(); i++){
+				Square square = playables.get(i);
+				if (lossBoards.contains(square.getXC() * 3 + square.getYC())) elims.add(square);
+			}
+			playables = pickSquare(playables, elims);
+			if (playables.size() == 1){
+				Square square = playables.get(0);
+				Board board = square.getBoard();
+				if (board.play(player, square.getXC(), square.getYC())) {
+					if (getPlayer() > 0) setPlayables(square.getXC(), square.getYC());
+					break move;
+				}
+				else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
+			}
+			elims.clear();
+			// avoid game win boards
+			for (int i = 0; i < playables.size(); i++){
+				Square square = playables.get(i);
+				if (winBoards.contains(square.getXC() * 3 + square.getYC())) elims.add(square);
+			}			
+			playables = pickSquare(playables, elims);
+			if (playables.size() == 1){
+				Square square = playables.get(0);
+				Board board = square.getBoard();
+				if (board.play(player, square.getXC(), square.getYC())) {
+					if (getPlayer() > 0) setPlayables(square.getXC(), square.getYC());
+					break move;
+				}
+				else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
+			}
+			elims.clear();
+			// avoid full/owned boards
+			for (int i = 0; i < playables.size(); i++){
+				Square square = playables.get(i);
+				if (boards[square.getXC()][square.getYC()].getOwner() > 0 || boards[square.getXC()][square.getYC()].full == 9) elims.add(square);
+			}			
+			playables = pickSquare(playables, elims);
+			if (playables.size() == 1){
+				Square square = playables.get(0);
+				Board board = square.getBoard();
+				if (board.play(player, square.getXC(), square.getYC())) {
+					if (getPlayer() > 0) setPlayables(square.getXC(), square.getYC());
+					break move;
+				}
+				else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
+			}
+			elims.clear();
+			// avoid w boards
+			for (int i = 0; i < playables.size(); i++){
+				Square square = playables.get(i);
+				if (wBoards.contains(square.getXC() * 3 + square.getYC())) elims.add(square);
+			}
+			playables = pickSquare(playables, elims);
+			if (playables.size() == 1){
+				Square square = playables.get(0);
+				Board board = square.getBoard();
+				if (board.play(player, square.getXC(), square.getYC())) {
+					if (getPlayer() > 0) setPlayables(square.getXC(), square.getYC());
+					break move;
+				}
+				else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
+			}
+			elims.clear();
+			// avoid ow boards
+			for (int i = 0; i < playables.size(); i++){
+				Square square = playables.get(i);
+				if (owBoards.contains(square.getXC() * 3 + square.getYC())) elims.add(square);
+			}
+			playables = pickSquare(playables, elims);
+			if (playables.size() == 1){
+				Square square = playables.get(0);
+				Board board = square.getBoard();
+				if (board.play(player, square.getXC(), square.getYC())) {
+					if (getPlayer() > 0) setPlayables(square.getXC(), square.getYC());
+					break move;
+				}
+				else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
+			}
+			elims.clear();
+			// avoid gw boards
+			for (int i = 0; i < playables.size(); i++){
+				Square square = playables.get(i);
+				if (gwBoards.contains(square.getXC() * 3 + square.getYC())) elims.add(square);
+			}
+			playables = pickSquare(playables, elims);
+			if (playables.size() == 1){
+				Square square = playables.get(0);
+				Board board = square.getBoard();
+				if (board.play(player, square.getXC(), square.getYC())) {
+					if (getPlayer() > 0) setPlayables(square.getXC(), square.getYC());
+					break move;
+				}
+				else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
+			}
+			elims.clear();
+			// avoid ogw boards
+			for (int i = 0; i < playables.size(); i++){
+				Square square = playables.get(i);
+				if (ogwBoards.contains(square.getXC() * 3 + square.getYC())) elims.add(square);
+			}
+			playables = pickSquare(playables, elims);
+			if (playables.size() == 1){
+				Square square = playables.get(0);
+				Board board = square.getBoard();
+				if (board.play(player, square.getXC(), square.getYC())) {
+					if (getPlayer() > 0) setPlayables(square.getXC(), square.getYC());
+					break move;
+				}
+				else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
+			}
+			elims.clear();
 			// then send to fewest opponent squares taken, send to fewest AI squares taken
+
 			// build elimination set for each criteria, if it ever has size equal to playables, play randomly from that set
 			// else remove all from playables and continue (if list size after removal is 1, play that move)
 			
 			// if all elimination criteria are exhausted, select randomly from remaining squares
-			
+			elims = playables;
+			playables = pickSquare(playables, elims);
+			if (playables.size() == 1){
+				Square square = playables.get(0);
+				Board board = square.getBoard();
+				if (board.play(player, square.getXC(), square.getYC())) {
+					if (getPlayer() > 0) setPlayables(square.getXC(), square.getYC());
+					break move;
+				}
+				else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
+			}
+			// fallback that should never be hit: move randomly
+			moveEasy();
+			JOptionPane.showMessageDialog(this, "Hard AI Fallback hit", "moveEasy() triggered somehow", JOptionPane.WARNING_MESSAGE);
+			break move;
 		}
 	}
 	
 	// TODO: Difficulty 4? understanding forks, micro board strategy (modifies elim criteria)
 	
 	/// BEGIN AI HELPERS ///
+	
+	// removes eliminated squares from playable list
+	// if that would remove all, pick one randomly and return it
+	private ArrayList<Square> pickSquare(ArrayList<Square> p, ArrayList<Square> e){
+		ArrayList<Square> ret = new ArrayList<Square>(81);
+		// if the two lists are identical, play at random
+		if (p.size() == e.size()){
+			ret.add(p.get(randInt(0,p.size()-1)));
+			return ret;
+		}
+		// otherwise, return all options and continue
+		for (int i = 0; i < p.size(); i++){
+			if (!e.contains(p.get(i))) ret.add(p.get(i));
+		}
+		return ret;
+	}
 	
 	// takes board from 0 to 8 to see if winning it wins the game
 	private boolean gameWinnable(int board, int player){

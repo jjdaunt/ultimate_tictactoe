@@ -58,6 +58,18 @@ public class Square extends JPanel implements MouseListener {
 	public int getOwner(){
 		return this.owner;
 	}
+
+	public int getXC(){
+		return this.x;
+	}
+
+	public int getYC(){
+		return this.y;
+	}
+
+	public Board getBoard(){
+		return this.board;
+	}
 	
 	public void setOwner(int owner){
 		this.owner = owner;
