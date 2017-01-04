@@ -294,7 +294,7 @@ public class UTTT_Game extends JFrame {
 			// elimination set
 			ArrayList<Square> elims = new ArrayList<Square>(81);
 			// begin eliminating with avoidance hierarchy: loss, win, w, ow, gw, ogw
-			// TODO: Condense this after testing it, you monkey
+			// TODO: Condense this after testing it, you monkey. The play on 1-size should be a function.
 			for (int i = 0; i < playables.size(); i++){
 				Square square = playables.get(i);
 				if (lossBoards.contains(square.getXC() * 3 + square.getYC())) elims.add(square);
@@ -406,11 +406,56 @@ public class UTTT_Game extends JFrame {
 				else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
 			}
 			elims.clear();
-			// then send to fewest opponent squares taken, send to fewest AI squares taken
-
-			// build elimination set for each criteria, if it ever has size equal to playables, play randomly from that set
-			// else remove all from playables and continue (if list size after removal is 1, play that move)
-			
+			// then send to fewest opponent squares taken
+			int redmax = 0;
+			for (int i = 0; i < playables.size(); i++){
+				Square square = playables.get(i);
+				Board board = boards[square.getXC()][square.getYC()];
+				if (board.reds > redmax){
+					elims.clear();
+					elims.add(square);
+				}
+				else if (board.reds == redmax) elims.add(square);
+			}
+			// if this would eliminate all, skip it as a tiebreaker
+			if (!(playables.size() == elims.size())) {
+				playables = pickSquare(playables, elims);
+				if (playables.size() == 1){
+					Square square = playables.get(0);
+					Board board = square.getBoard();
+					if (board.play(player, square.getXC(), square.getYC())) {
+						if (getPlayer() > 0) setPlayables(square.getXC(), square.getYC());
+						break move;
+					}
+					else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
+				}
+			}
+			elims.clear();
+			// send to fewest AI squares taken
+			int bluemax = 0;
+			for (int i = 0; i < playables.size(); i++){
+				Square square = playables.get(i);
+				Board board = boards[square.getXC()][square.getYC()];
+				if (board.blues > bluemax){
+					elims.clear();
+					elims.add(square);
+				}
+				else if (board.blues == bluemax) elims.add(square);
+			}
+			// if this would eliminate all, skip it as a tiebreaker
+			if (!(playables.size() == elims.size())) {
+				playables = pickSquare(playables, elims);
+				if (playables.size() == 1){
+					Square square = playables.get(0);
+					Board board = square.getBoard();
+					if (board.play(player, square.getXC(), square.getYC())) {
+						if (getPlayer() > 0) setPlayables(square.getXC(), square.getYC());
+						break move;
+					}
+					else JOptionPane.showMessageDialog(this, "OOPS", "The programmer is a monkey.", JOptionPane.WARNING_MESSAGE);
+				}
+			}
+			elims.clear();
 			// if all elimination criteria are exhausted, select randomly from remaining squares
 			elims = playables;
 			playables = pickSquare(playables, elims);
@@ -425,7 +470,7 @@ public class UTTT_Game extends JFrame {
 			}
 			// fallback that should never be hit: move randomly
 			moveEasy();
-			JOptionPane.showMessageDialog(this, "Hard AI Fallback hit", "moveEasy() triggered somehow", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Hard AI Fallback", "moveEasy() triggered somehow", JOptionPane.WARNING_MESSAGE);
 			break move;
 		}
 	}
