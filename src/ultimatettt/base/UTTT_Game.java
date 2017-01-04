@@ -413,6 +413,7 @@ public class UTTT_Game extends JFrame {
 				Square square = playables.get(i);
 				Board board = boards[square.getXC()][square.getYC()];
 				if (board.reds > redmax){
+					redmax = board.reds;
 					elims.clear();
 					elims.add(square);
 				}
@@ -438,6 +439,7 @@ public class UTTT_Game extends JFrame {
 				Square square = playables.get(i);
 				Board board = boards[square.getXC()][square.getYC()];
 				if (board.blues > bluemax){
+					bluemax = board.blues;
 					elims.clear();
 					elims.add(square);
 				}
