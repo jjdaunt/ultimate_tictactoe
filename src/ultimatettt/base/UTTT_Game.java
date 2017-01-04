@@ -215,6 +215,7 @@ public class UTTT_Game extends JFrame {
 		// target certain boards in a hierarchy
 		// if no move is found that doesn't violate loss constraints, builds a set of playable squares
 		// and progressively eliminates options until it chooses randomly from a minimal set
+
 		move: for (;;) {
 			// if there is a board that can be played on and won, do that
 			for (int i = 0; i < 9; i++) {
@@ -505,7 +506,7 @@ public class UTTT_Game extends JFrame {
 				break;
 			case 1:
 				if (boards[0][0].getOwner() == player && boards[0][2].getOwner() == player) return true;
-				if (boards[1][1].getOwner() == player && boards[1][2].getOwner() == player) return true;
+				if (boards[1][1].getOwner() == player && boards[2][1].getOwner() == player) return true;
 				break;
 			case 2:
 				if (boards[0][1].getOwner() == player && boards[0][0].getOwner() == player) return true;
@@ -559,7 +560,7 @@ public class UTTT_Game extends JFrame {
 					break;
 				case 1:
 					if (b.squares[0][0].getOwner() == player && b.squares[0][2].getOwner() == player) target = i;
-					if (b.squares[1][1].getOwner() == player && b.squares[1][2].getOwner() == player) target = i;
+					if (b.squares[1][1].getOwner() == player && b.squares[2][1].getOwner() == player) target = i;
 					break;
 				case 2:
 					if (b.squares[0][1].getOwner() == player && b.squares[0][0].getOwner() == player) target = i;
