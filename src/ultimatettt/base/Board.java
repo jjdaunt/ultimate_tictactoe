@@ -16,6 +16,8 @@ public class Board extends JPanel {
 	private Color[] colours = {new Color(191,0,0),  new Color(0,127,255)};
 	public Square[][] squares = new Square[3][3];
 	public int full = 0; // full squares
+	public int reds = 0;
+	public int blues = 0;
 
 	public Board(UTTT_Game game){
 		this.game = game;
@@ -43,6 +45,8 @@ public class Board extends JPanel {
 		this.squares[x][y].setOwner(owner);
 		checkSquares();
 		this.full++;
+		if (owner == 1) this.reds++;
+		else this.blues++;
 		return true;
 	}
 	
@@ -80,6 +84,8 @@ public class Board extends JPanel {
 	
 	void resetBoard(){
 		this.full = 0;
+		this.reds = 0;
+		this.blues = 0;
 		this.playable = true;
 		this.owner = 0;
 		this.setBackground(Color.BLACK);

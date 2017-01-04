@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.*;;
@@ -153,7 +154,8 @@ public class UTTT_Game extends JFrame {
 	}
 	
 	private void moveMedium(){
-		// Difficulty 2, actually tries. Priority: win game, prevent loss, win board, block board, fallback to moveEasy
+		// Difficulty 2, actually tries. Doesn't have a great grasp of macro strategy.
+		// Priority: win game, prevent loss on playable boards, win board, block board, fallback to moveEasy
 		move: for (;;) {
 			// if there is a board that can be played on and won, do that
 			for (int i = 0; i < 9; i++) {
@@ -209,17 +211,99 @@ public class UTTT_Game extends JFrame {
 	
 	private void moveHard(){
 		// Difficulty 3, has some semblance of a plan to win the game.
-		/* Priority system:
-		 * Inherit from medium, but add:
-		 * avoid target sending to opp winnable boards
-		 * send to fewest opponent squares taken
-		 * send to fewest AI squares taken
-		 * take corner > centre > side
-		 * send to side > corner > centre
-		 */
+		// Priority system largely inherited from medium, with emphasis on avoiding moves that
+		// target certain boards in a hierarchy
+		// if no move is found that doesn't violate loss constraints, builds a set of playable squares
+		// and progressively eliminates options until it chooses randomly from a minimal set
+		move: for (;;) {
+			// if there is a board that can be played on and won, do that
+			for (int i = 0; i < 9; i++) {
+				if (boards[i/3][i%3].playable && gameWinnable(i, 2)){
+					int target = boardWinnable(i, 2);
+					if (target > -1){
+						if (this.boards[i/3][i%3].play(player, target/3, target%3)) {
+							if (getPlayer() > 0) setPlayables(target/3, target%3);
+							break move;
+						}
+					}
+				}
+			}
+			// find boards to avoid since they're game-winnable
+			ArrayList<Integer> ogwBoards = new ArrayList<Integer>(9); // player
+			ArrayList<Integer> gwBoards = new ArrayList<Integer>(9); // AI
+			for (int i = 0; i < 9; i++) {
+				if (gameWinnable(i, 1)) ogwBoards.add(i);
+				if (gameWinnable(i, 2)) gwBoards.add(i);
+			}
+			// find boards that can be won in one move
+			ArrayList<Integer> owBoards = new ArrayList<Integer>(9);
+			ArrayList<Integer> wBoards = new ArrayList<Integer>(9);
+			for (int i = 0; i < 9; i++) {
+				if (boardWinnable(i, 1) > -1) owBoards.add(i);
+				if (boardWinnable(i, 2) > -1) wBoards.add(i);
+			}
+			// the intersection of these should be absolutely avoided as they lead directly to a loss (or blocked win)
+			ArrayList<Integer> lossBoards = new ArrayList<Integer>(9);
+			ArrayList<Integer> winBoards = new ArrayList<Integer>(9);
+			for (int i = 0; i < 9; i++) {
+				if (ogwBoards.contains(i) && owBoards.contains(i)) lossBoards.add(i);
+				if (gwBoards.contains(i) && wBoards.contains(i)) winBoards.add(i);
+			}
+			// avoidance priority: loss, win, w, ow, gw, ogw
+			
+			// win a board over low-priority moves
+			for (int i = 0; i < 9; i++){
+				if (!boards[i/3][i%3].playable) continue;
+				int target = boardWinnable(i, 2);
+				if (target > -1 && !lossBoards.contains(target) && !winBoards.contains(target)){
+					// also avoid allowing opponent to play openly if that leads directly to a loss
+					if (boards[target/3][target%3].getOwner() > 0 && !lossBoards.isEmpty()) continue;
+					if (this.boards[i/3][i%3].play(player, target/3, target%3)) {
+						if (getPlayer() > 0) setPlayables(target/3, target%3);
+						break move;
+					}
+				}
+			}
+			
+			// block a won board unless that loses the game
+			for (int i = 0; i < 9; i++){
+				if (!boards[i/3][i%3].playable) continue;
+				int target = boardWinnable(i, 1);
+				if (target > -1){
+					// allow the play if it's blocking the current winnable board
+					// TODO: ignores fork possibilities, fix under D4
+					if (lossBoards.contains(target) && target != i) continue;
+					// also avoid allowing opponent to play openly if that leads directly to a loss
+					if (boards[target/3][target%3].getOwner() > 0 && !lossBoards.isEmpty()) continue;
+					if (this.boards[i/3][i%3].play(player, target/3, target%3)) {
+						if (getPlayer() > 0) setPlayables(target/3, target%3);
+						break move;
+					}
+				}
+			}
+			
+			// track playable squares
+			ArrayList<Square> playables = new ArrayList<Square>(81);
+			for (int i = 0; i < 9; i++){
+				if (!boards[i/3][i%3].playable) continue;
+				for (int j = 0; j < 9; j++){
+					
+				}
+			}
+			// elimination set
+			ArrayList<Square> elims = new ArrayList<Square>(81);
+			
+			// begin eliminating with avoidance hierarchy: loss, win, w, ow, gw, ogw
+			// then send to fewest opponent squares taken, send to fewest AI squares taken
+			// build elimination set for each criteria, if it ever has size equal to playables, play randomly from that set
+			// else remove all from playables and continue (if list size after removal is 1, play that move)
+			
+			// if all elimination criteria are exhausted, select randomly from remaining squares
+			
+		}
 	}
 	
-	// TODO: Difficulty 4? understanding forks, micro board strategy
+	// TODO: Difficulty 4? understanding forks, micro board strategy (modifies elim criteria)
 	
 	/// BEGIN AI HELPERS ///
 	
@@ -329,14 +413,14 @@ public class UTTT_Game extends JFrame {
 		return target;
 	}
 	
-	/// END AI, HELPERS ///
-	
 	public static int randInt(int min, int max){
 		Random rand = new Random();
 		int randomNum = rand.nextInt((max - min) + 1) + min;
 		return randomNum;
 	}
 	
+	/// END AI, AI HELPERS ///
+
 	private void setOptions(){
 		String[] options = new String[] {"1", "2"};
 		players = JOptionPane.showOptionDialog(this, "Select Player Count:", "vs AI or 2 Player?", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]) + 1;
