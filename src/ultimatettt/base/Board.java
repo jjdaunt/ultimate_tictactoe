@@ -43,10 +43,10 @@ public class Board extends JPanel {
 	public boolean play(int owner, int x, int y){
 		if (this.squares[x][y].getOwner() > 0 || this.getOwner() > 0) return false;
 		this.squares[x][y].setOwner(owner);
-		checkSquares();
 		this.full++;
 		if (owner == 1) this.reds++;
 		else this.blues++;
+		checkSquares();
 		return true;
 	}
 	
